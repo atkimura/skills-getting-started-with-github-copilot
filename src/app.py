@@ -8,6 +8,7 @@ for extracurricular activities at Mergington High School.
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 import os
 from pathlib import Path
 
@@ -78,6 +79,10 @@ activities = {
 }
 
 
+class SignupRequest(BaseModel):
+    email: str
+
+
 @app.get("/")
 def root():
     return RedirectResponse(url="/static/index.html")
@@ -89,9 +94,9 @@ def get_activities():
 
 
 @app.post("/activities/{activity_name}/signup")
-def signup_for_activity(activity_name: str, payload: dict):
+def signup_for_activity(activity_name: str, payload: SignupRequest):
     """Sign up a student for an activity"""
-    email = payload["email"].strip().lower()
+    email = payload.email.strip().lower()
 
     activity = activities.get(activity_name)
     if not activity:
